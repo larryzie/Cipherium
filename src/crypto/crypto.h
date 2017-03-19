@@ -31,6 +31,10 @@ struct EllipticCurveScalar {
   uint8_t data[32];
 };
 
+struct ec_point_pair {
+  EllipticCurvePoint a, b;
+};
+
   class crypto_ops {
     crypto_ops();
     crypto_ops(const crypto_ops &);

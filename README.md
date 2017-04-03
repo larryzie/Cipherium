@@ -3,7 +3,7 @@ This is a codebase based on [CryptoNote](https://cryptonote.org) cryptocurrency 
 * CryptoNote reference implementation: [CryptoNoteCoin](https://cryptonote-coin.org)
 * Discussion board and support: [CryptoNote Forum](https://forum.cryptonote.org)
 
-## Building GCoin
+## Building Cipherium
 
 ### On *nix
 

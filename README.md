@@ -5,7 +5,7 @@ This is a codebase based on [CryptoNote](https://cryptonote.org) cryptocurrency 
 
 ## Cipherium Binaries
 
-* Linux 64 bit: [Cypherium_linux_x64_v1_0_0.tar.gz](http://cypherium.org/downloads.html)
+* Linux 64 bit: [Cipherium_linux_x64_v1_0_0.tar.gz](http://cipherium.org/downloads.html)
 
 ## Building Cipherium
 

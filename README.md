@@ -41,7 +41,6 @@ To build, change to a directory where this file is located, and run these comman
 mkdir build
 cd build
 cmake -G "Visual Studio 12 Win64" ..
+msbuild Cryptonote.sln /p:Configuration=Release
 ```
 
-And then do Build.
-Good luck!

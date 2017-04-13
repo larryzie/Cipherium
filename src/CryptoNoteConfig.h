@@ -24,8 +24,8 @@ const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 //Specify total number of available coins
 //((uint64_t)(-1)) equals to 18446744073709551616 coins
 //or you can define number explicitly UINT64_C(858986905600000000)
-// 2^23 = 8388608 = 0x800000
-const uint64_t MONEY_SUPPLY                                  = 0x800000;
+// 2^50 = 1125899906842624 = 0x4000000000000
+const uint64_t MONEY_SUPPLY                                  = 0x4000000000000;
 const unsigned EMISSION_SPEED_FACTOR                         = 19;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
@@ -75,7 +75,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 
 //Put the name of your currency here
 const char     CRYPTONOTE_NAME[]                             = "Cipherium";
-const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff000110029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210152310ae736271a4916a5550d3c5fefe4633e5d6a07f03fdd7d512cb551d5ec3a";
+const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff00018080808008029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210167975c6de2041710b574612f79a7e73c17db935bf7747c6c8a58c5685321cf6a";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;

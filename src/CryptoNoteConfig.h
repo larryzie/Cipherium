@@ -24,7 +24,8 @@ const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 //Specify total number of available coins
 //((uint64_t)(-1)) equals to 18446744073709551616 coins
 //or you can define number explicitly UINT64_C(858986905600000000)
-const uint64_t MONEY_SUPPLY                                  = ((uint64_t)(-1));
+// 2^23 = 8388608 = 0x800000
+const uint64_t MONEY_SUPPLY                                  = 0x800000;
 const unsigned EMISSION_SPEED_FACTOR                         = 19;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
@@ -39,7 +40,7 @@ const uint64_t MINIMUM_FEE                                   = 1000;
 const uint64_t DEFAULT_DUST_THRESHOLD                        = MINIMUM_FEE;
 
 //Define preferred block's target time
-const uint64_t DIFFICULTY_TARGET                             = 540; // seconds
+const uint64_t DIFFICULTY_TARGET                             = 480; // seconds
 const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DIFFICULTY_TARGET;
 //There are options to tune CryptoNote's difficulty retargeting function.
 //We recommend not to change it.
@@ -74,7 +75,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 
 //Put the name of your currency here
 const char     CRYPTONOTE_NAME[]                             = "Cipherium";
-const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff0001ffffffffffff07029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd0880712101d8071da31e35841d677720e45741c7935f133a2ffb451f7dbc65b898273b4bd9";
+const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff000110029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210152310ae736271a4916a5550d3c5fefe4633e5d6a07f03fdd7d512cb551d5ec3a";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;
 const uint8_t  BLOCK_MAJOR_VERSION_1                         =  1;

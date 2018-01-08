@@ -33,7 +33,7 @@ To build, change to a directory where this file is located, and run `make`. The 
 ### On Windows
 Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.55. You may download them from:
 
-* http://www.microsoft.com/
+* https://visualstudio.com/vs/community/
 * http://www.cmake.org/
 * http://www.boost.org/
 

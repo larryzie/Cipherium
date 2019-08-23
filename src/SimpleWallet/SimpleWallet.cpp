@@ -426,7 +426,7 @@ bool writeAddressFile(const std::string& addressFilename, const std::string& add
 
 std::string simple_wallet::get_commands_str() {
   std::stringstream ss;
-  ss << CryptoNote::CRYPTONOTE_NAME << " (v" << PROJECT_VERSION_LONG << ")" << ENDL << ENDL;
+  ss << CryptoNote::CRYPTONOTE_NAME << "simplewallet (v" << PROJECT_VERSION_LONG << ")" << ENDL << ENDL;
   ss << "Commands: " << ENDL;
   std::string usage = m_consoleHandler.getUsage();
   boost::replace_all(usage, "\n", "\n  ");

@@ -181,7 +181,6 @@ namespace Crypto {
     sc_add(reinterpret_cast<unsigned char*>(&derived_key), reinterpret_cast<const unsigned char*>(&base), reinterpret_cast<unsigned char*>(&scalar));
   }
 
-
   bool crypto_ops::underive_public_key(const KeyDerivation &derivation, size_t output_index,
     const PublicKey &derived_key, PublicKey &base) {
     EllipticCurveScalar scalar;
@@ -295,7 +294,7 @@ namespace Crypto {
     ge_p1p1_to_p2(&point, &point2);
     ge_tobytes(reinterpret_cast<unsigned char*>(&key), &point);
   }
-  
+
   void crypto_ops::generate_key_image(const PublicKey &pub, const SecretKey &sec, KeyImage &image) {
     ge_p3 point;
     ge_p2 point2;
@@ -304,7 +303,7 @@ namespace Crypto {
     ge_scalarmult(&point2, reinterpret_cast<const unsigned char*>(&sec), &point);
     ge_tobytes(reinterpret_cast<unsigned char*>(&image), &point2);
   }
-  
+
   void crypto_ops::generate_incomplete_key_image(const PublicKey &pub, EllipticCurvePoint &incomplete_key_image) {
     ge_p3 point;
     hash_to_ec(pub, point);
@@ -321,7 +320,7 @@ namespace Crypto {
   };
 
   static inline size_t rs_comm_size(size_t pubs_count) {
-    return sizeof(rs_comm) + pubs_count * sizeof(ec_point_pair);  
+    return sizeof(rs_comm) + pubs_count * sizeof(ec_point_pair);
   }
 
   void crypto_ops::generate_ring_signature(const Hash &prefix_hash, const KeyImage &image,

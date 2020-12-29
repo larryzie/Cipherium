@@ -96,17 +96,17 @@ std::string Ipv4Address::toDottedDecimal() const {
 
 bool Ipv4Address::isLoopback() const {
   // 127.0.0.0/8
-  return (value & 0xff000000) == (127 << 24);
+  return (value & 0xff000000) == (127u << 24);
 }
 
 bool Ipv4Address::isPrivate() const {
   return
     // 10.0.0.0/8
-    (value & 0xff000000) == (10 << 24) ||
+    (value & 0xff000000) == (10u << 24) ||
     // 172.16.0.0/12
-    (value & 0xfff00000) == ((172 << 24) | (16 << 16)) ||
+    (value & 0xfff00000) == ((172u << 24) | (16u << 16)) ||
     // 192.168.0.0/16
-    (value & 0xffff0000) == ((192 << 24) | (168 << 16));
+    (value & 0xffff0000) == ((192u << 24) | (168u << 16));
 }
 
 }

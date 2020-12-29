@@ -101,7 +101,7 @@ bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<Block>& b
 
 bool core::get_blocks(uint32_t start_offset, uint32_t count, std::list<Block>& blocks) {
   return m_blockchain.getBlocks(start_offset, count, blocks);
-}  
+}
 void core::getTransactions(const std::vector<Crypto::Hash>& txs_ids, std::list<Transaction>& txs, std::list<Crypto::Hash>& missed_txs, bool checkTxPool) {
   m_blockchain.getTransactions(txs_ids, txs, missed_txs, checkTxPool);
 }
@@ -254,6 +254,12 @@ bool core::check_tx_semantic(const Transaction& tx, bool keeped_by_block) {
     return false;
   }
 
+  if (!check_tx_inputs_keyimages_domain(tx))
+  {
+    logger(ERROR) << "tx uses key image not in the valid domain";
+    return false;
+  }
+
   if (!checkMultisignatureInputsDiff(tx)) {
     logger(ERROR) << "tx has a few multisignature inputs with identical output indexes";
     return false;
@@ -273,6 +279,32 @@ bool core::check_tx_inputs_keyimages_diff(const Transaction& tx) {
   return true;
 }
 
+
+extern "C" {
+  #include "../crypto/crypto-ops.h"
+}
+bool core::check_tx_inputs_keyimages_domain(const Transaction& tx) const
+{
+  static const unsigned char I[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+                             L[] = {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10};
+  Crypto::KeyImage keyImage;
+  ge_p3 ge_keyImage;
+  ge_p2 ge_result;
+  unsigned char aP[32];
+
+  for (const auto& in : tx.inputs) {
+    if (in.type() == typeid(KeyInput)) {
+      keyImage = get<KeyInput>(in).keyImage;
+      ge_frombytes_vartime(&ge_keyImage ,reinterpret_cast<const unsigned char *>(&keyImage));
+      ge_scalarmult(&ge_result, L, &ge_keyImage);
+      ge_tobytes(aP, &ge_result);
+      if (std::memcmp(aP, I, 32))
+        return false;
+    }
+  }
+  return true;
+}
+
 size_t core::get_blockchain_total_transactions() {
   return m_blockchain.getTotalTransactions();
 }
@@ -283,7 +315,7 @@ size_t core::get_blockchain_total_transactions() {
 //}
 
 bool core::add_new_tx(const Transaction& tx, const Crypto::Hash& tx_hash, size_t blob_size, tx_verification_context& tvc, bool keeped_by_block) {
-  //Locking on m_mempool and m_blockchain closes possibility to add tx to memory pool which is already in blockchain 
+  //Locking on m_mempool and m_blockchain closes possibility to add tx to memory pool which is already in blockchain
   std::lock_guard<decltype(m_mempool)> lk(m_mempool);
   LockedBlockchainStorage lbs(m_blockchain);
 
@@ -337,9 +369,9 @@ bool core::get_block_template(Block& b, const AccountPublicAddress& adr, difficu
      */
   //make blocks coin-base tx looks close to real coinbase tx to get truthful blob size
   bool r = m_currency.constructMinerTx(height, median_size, already_generated_coins, txs_size, fee, adr, b.baseTransaction, ex_nonce, 11);
-  if (!r) { 
-    logger(ERROR, BRIGHT_RED) << "Failed to construct miner tx, first chance"; 
-    return false; 
+  if (!r) {
+    logger(ERROR, BRIGHT_RED) << "Failed to construct miner tx, first chance";
+    return false;
   }
 
   size_t cumulative_size = txs_size + getObjectBinarySize(b.baseTransaction);
@@ -819,9 +851,9 @@ bool core::scanOutputkeysForIndices(const KeyInput& txInToKey, std::list<std::pa
       return true;
     }
   };
-    
+
   outputs_visitor vi(outputReferences);
-    
+
   return m_blockchain.scanOutputKeysForIndexes(txInToKey, vi);
 }
 

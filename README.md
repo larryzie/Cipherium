@@ -12,7 +12,7 @@ This is a codebase based on [CryptoNote](https://cryptonote.org) cryptocurrency 
 
 ### On *nix
 
-Dependencies: GCC 4.7.3 or later, CMake 2.8.6 or later, and Boost 1.55.
+Dependencies: GCC 7.1.0 or later, CMake 2.8.6 or later, and Boost 1.55.
 
 You may download them from:
 

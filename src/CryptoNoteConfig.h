@@ -86,7 +86,7 @@ const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json"
 } /* parameters */
 
 /* executable name */
-const char     CRYPTONOTE_NAME[]                             = "Cipherium";
+const char     CRYPTONOTE_NAME[]                             = "cipheriumd";
 const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff00018080808008029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210167975c6de2041710b574612f79a7e73c17db935bf7747c6c8a58c5685321cf6a";
 
 const uint8_t  CURRENT_TRANSACTION_VERSION                   =  1;

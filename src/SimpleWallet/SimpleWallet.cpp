@@ -17,6 +17,11 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/hex.hpp>
+
+extern "C" {
+  #include "crypto/crypto-ops.h"
+}
 
 #include "Common/CommandLine.h"
 #include "Common/SignalHandler.h"
@@ -55,13 +60,14 @@ namespace {
 
 const command_line::arg_descriptor<std::string> arg_wallet_file = { "wallet-file", "Use wallet <arg>", "" };
 const command_line::arg_descriptor<std::string> arg_generate_new_wallet = { "generate-new-wallet", "Generate new wallet and save it to <arg>", "" };
+const command_line::arg_descriptor<std::string> arg_import_keys = { "import-priv-keys", "Import private spend and view keys <arg>:<arg> to new wallet", "" };
+const command_line::arg_descriptor<std::string> arg_password = { "password", "Wallet password", "", true };
 const command_line::arg_descriptor<std::string> arg_daemon_address = { "daemon-address", "Use daemon instance at <host>:<port>", "" };
 const command_line::arg_descriptor<std::string> arg_daemon_host = { "daemon-host", "Use daemon instance at host <arg> instead of localhost", "" };
-const command_line::arg_descriptor<std::string> arg_password = { "password", "Wallet password", "", true };
 const command_line::arg_descriptor<uint16_t> arg_daemon_port = { "daemon-port", "Use daemon instance at port <arg> instead of 8081", 0 };
+const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
 const command_line::arg_descriptor<uint32_t> arg_log_level = { "set_log", "", INFO, true };
 const command_line::arg_descriptor<bool> arg_testnet = { "testnet", "Used to deploy test nets. The daemon must be launched with --testnet flag", false };
-const command_line::arg_descriptor< std::vector<std::string> > arg_command = { "command", "" };
 
 
 bool parseUrlAddress(const std::string& url, std::string& address, uint16_t& port) {
@@ -504,42 +510,43 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     return false;
   }
 
-  if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
-    std::cout << "Nor 'generate-new-wallet' neither 'wallet-file' argument was specified.\nWhat do you want to do?\n[O]pen existing wallet, [G]enerate new wallet file or [E]xit.\n";
-    char c;
-    do {
-      std::string answer;
-      std::getline(std::cin, answer);
-      c = answer[0];
-      if (!(c == 'O' || c == 'G' || c == 'E' || c == 'o' || c == 'g' || c == 'e')) {
-        std::cout << "Unknown command: " << c <<std::endl;
-      } else {
-        break;
-      }
-    } while (true);
+  if (!m_generate_new.empty() && !m_wallet_file_arg.empty()) {
+    fail_msg_writer() << "You can't specify 'generate-new-wallet' and 'wallet-file' arguments simultaneously";
+    return false;
+  }
 
-    if (c == 'E' || c == 'e') {
-      return false;
+  if (m_generate_new.empty() && m_wallet_file_arg.empty()) {
+    char c = 'g';
+    if (m_in_keys.empty()) {
+      do {
+        logger(INFO) << "[G]enerate new wallet or [O]pen existing wallet?";
+        std::string answer;
+        std::getline(std::cin, answer);
+        c = answer[0];
+        if (!(c == 'O' || c == 'G' || c == 'o' || c == 'g' )) {
+          std::cout << "Unknown command: " << c <<std::endl;
+        } else {
+          break;
+        }
+      } while (true);
+    } else {
+      logger(INFO) << "Imported keys accepted from command line";
     }
 
-    std::cout << "Specify wallet file name (e.g., wallet.bin).\n";
+    logger(INFO) << "Specify wallet file name (e.g., wallet.bin).";
     std::string userInput;
     do {
       std::cout << "Wallet file name: ";
       std::getline(std::cin, userInput);
       boost::algorithm::trim(userInput);
     } while (userInput.empty());
+    logger(INFO) << "Wallet file name: " << userInput << " accepted.";
 
     if (c == 'g' || c == 'G') {
       m_generate_new = userInput;
     } else {
       m_wallet_file_arg = userInput;
     }
-  }
-
-  if (!m_generate_new.empty() && !m_wallet_file_arg.empty()) {
-    fail_msg_writer() << "you can't specify 'generate-new-wallet' and 'wallet-file' arguments simultaneously";
-    return false;
   }
 
   std::string walletFileName;
@@ -598,7 +605,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     }
 
     if (!new_wallet(walletFileName, pwd_container.password())) {
-      logger(ERROR, BRIGHT_RED) << "account creation failed";
+      logger(ERROR, BRIGHT_RED) << "Account creation failed";
       return false;
     }
 
@@ -614,6 +621,8 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       fail_msg_writer() << "failed to load wallet: " << e.what();
       return false;
     }
+    if (!m_in_keys.empty())
+      logger(INFO, BRIGHT_WHITE) << "Existing wallet will ignore command line key arguments... ";
 
     m_wallet->addObserver(this);
     m_node->addObserver(static_cast<INodeObserver*>(this));
@@ -646,6 +655,7 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
   m_daemon_address = command_line::get_arg(vm, arg_daemon_address);
   m_daemon_host = command_line::get_arg(vm, arg_daemon_host);
   m_daemon_port = command_line::get_arg(vm, arg_daemon_port);
+  m_in_keys = command_line::get_arg(vm, arg_import_keys);
 }
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string& password) {
@@ -657,7 +667,26 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
   try {
     m_initResultPromise.reset(new std::promise<std::error_code>());
     std::future<std::error_code> f_initError = m_initResultPromise->get_future();
-    m_wallet->initAndGenerate(password);
+    if(!m_in_keys.empty()) {
+      std::vector<std::string> keys;
+      boost::split(keys, m_in_keys, boost::is_any_of(":"));
+      unsigned char* k;
+      for (auto &key : keys) {
+        k = reinterpret_cast<unsigned char *>(&key);
+        if (sc_check(k))
+          return false;
+      }
+      AccountKeys inAccountKeys;
+      std::string hash = boost::algorithm::unhex(keys[0]);
+      std::copy(hash.begin(), hash.end(), inAccountKeys.spendSecretKey.data);
+      hash = boost::algorithm::unhex(keys[1]);
+      std::copy(hash.begin(), hash.end(), inAccountKeys.viewSecretKey.data);
+      Crypto::secret_key_to_public_key(inAccountKeys.spendSecretKey, inAccountKeys.address.spendPublicKey);
+      Crypto::secret_key_to_public_key(inAccountKeys.viewSecretKey, inAccountKeys.address.viewPublicKey);
+      m_wallet->initWithKeys(inAccountKeys, password);
+    } else {
+      m_wallet->initAndGenerate(password);
+    }
     auto initError = f_initError.get();
     m_initResultPromise.reset(nullptr);
     if (initError) {
@@ -678,6 +707,10 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     logger(INFO, BRIGHT_WHITE) <<
       "Generated new wallet: " << m_wallet->getAddress() << std::endl <<
       "view key: " << Common::podToHex(keys.viewSecretKey);
+  }
+  catch (const char* msg) {
+    fail_msg_writer() << "failed to generate new wallet: " << msg;
+    return false;
   }
   catch (const std::exception& e) {
     fail_msg_writer() << "failed to generate new wallet: " << e.what();
@@ -1074,6 +1107,7 @@ int main(int argc, char* argv[]) {
   po::options_description desc_params("Wallet options");
   command_line::add_arg(desc_params, arg_wallet_file);
   command_line::add_arg(desc_params, arg_generate_new_wallet);
+  command_line::add_arg(desc_params, arg_import_keys);
   command_line::add_arg(desc_params, arg_password);
   command_line::add_arg(desc_params, arg_daemon_address);
   command_line::add_arg(desc_params, arg_daemon_host);

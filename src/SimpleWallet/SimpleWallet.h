@@ -143,6 +143,7 @@ namespace CryptoNote
     std::string m_wallet_file_arg;
     std::string m_generate_new;
     std::string m_import_path;
+    std::string m_in_keys;
 
     std::string m_daemon_address;
     std::string m_daemon_host;

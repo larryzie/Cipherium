@@ -708,10 +708,6 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
       "Generated new wallet: " << m_wallet->getAddress() << std::endl <<
       "view key: " << Common::podToHex(keys.viewSecretKey);
   }
-  catch (const char* msg) {
-    fail_msg_writer() << "failed to generate new wallet: " << msg;
-    return false;
-  }
   catch (const std::exception& e) {
     fail_msg_writer() << "failed to generate new wallet: " << e.what();
     return false;

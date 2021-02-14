@@ -4,16 +4,20 @@
 
 #include "Core.h"
 
+extern "C" {
+  #include "../crypto/crypto-ops.h"
+}
+
 #include <sstream>
 #include <unordered_set>
 #include "../CryptoNoteConfig.h"
 #include "../Common/CommandLine.h"
 #include "../Common/Util.h"
 #include "../Common/StringTools.h"
-#include "../crypto/crypto.h"
 #include "../CryptoNoteProtocol/CryptoNoteProtocolDefinitions.h"
 #include "../Logging/LoggerRef.h"
 #include "../Rpc/CoreRpcServerCommandsDefinitions.h"
+#include "crypto/crypto.h"
 #include "CryptoNoteFormatUtils.h"
 #include "CryptoNoteTools.h"
 #include "CryptoNoteStatInfo.h"
@@ -50,6 +54,16 @@ private:
 
   friend class core;
 };
+
+static const unsigned char I[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+                           L[] = {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10};
+
+inline const unsigned char* curveOrder() {
+  return L;
+}
+inline const unsigned char* identity() {
+  return I;
+}
 
 core::core(const Currency& currency, i_cryptonote_protocol* pprotocol, Logging::ILogger& logger) :
 m_currency(currency),
@@ -279,14 +293,8 @@ bool core::check_tx_inputs_keyimages_diff(const Transaction& tx) {
   return true;
 }
 
-
-extern "C" {
-  #include "../crypto/crypto-ops.h"
-}
 bool core::check_tx_inputs_keyimages_domain(const Transaction& tx) const
 {
-  static const unsigned char I[] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-                             L[] = {0xed, 0xd3, 0xf5, 0x5c, 0x1a, 0x63, 0x12, 0x58, 0xd6, 0x9c, 0xf7, 0xa2, 0xde, 0xf9, 0xde, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10};
   Crypto::KeyImage keyImage;
   ge_p3 ge_keyImage;
   ge_p2 ge_result;
@@ -296,9 +304,9 @@ bool core::check_tx_inputs_keyimages_domain(const Transaction& tx) const
     if (in.type() == typeid(KeyInput)) {
       keyImage = get<KeyInput>(in).keyImage;
       ge_frombytes_vartime(&ge_keyImage ,reinterpret_cast<const unsigned char *>(&keyImage));
-      ge_scalarmult(&ge_result, L, &ge_keyImage);
+      ge_scalarmult(&ge_result, curveOrder(), &ge_keyImage);
       ge_tobytes(aP, &ge_result);
-      if (std::memcmp(aP, I, 32))
+      if (std::memcmp(aP, identity(), 32))
         return false;
     }
   }
@@ -1010,7 +1018,7 @@ std::unique_ptr<IBlock> core::getBlock(const Crypto::Hash& blockId) {
     return std::unique_ptr<BlockWithTransactions>(nullptr);
   }
 
-  return std::move(blockPtr);
+  return blockPtr;
 }
 
 bool core::addMessageQueue(MessageQueue<BlockchainMessage>& messageQueue) {

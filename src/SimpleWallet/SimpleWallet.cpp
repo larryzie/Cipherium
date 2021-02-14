@@ -533,7 +533,7 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       logger(INFO) << "Imported keys accepted from command line";
     }
 
-    logger(INFO) << "Specify wallet file name (e.g., wallet.bin).";
+    logger(INFO) << "Specify wallet file name (e.g., MyWallet).";
     std::string userInput;
     do {
       std::cout << "Wallet file name: ";
@@ -660,6 +660,7 @@ void simple_wallet::handle_command_line(const boost::program_options::variables_
 //----------------------------------------------------------------------------------------------------
 bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string& password) {
   m_wallet_file = wallet_file;
+  AccountKeys accountKeys;
 
   m_wallet.reset(new WalletLegacy(m_currency, *m_node.get()));
   m_node->addObserver(static_cast<INodeObserver*>(this));
@@ -668,22 +669,21 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
     m_initResultPromise.reset(new std::promise<std::error_code>());
     std::future<std::error_code> f_initError = m_initResultPromise->get_future();
     if(!m_in_keys.empty()) {
-      std::vector<std::string> keys;
-      boost::split(keys, m_in_keys, boost::is_any_of(":"));
+      std::vector<std::string> in_keys;
+      boost::split(in_keys, m_in_keys, boost::is_any_of(":"));
       unsigned char* k;
-      for (auto &key : keys) {
+      for (auto &key : in_keys) {
         k = reinterpret_cast<unsigned char *>(&key);
         if (sc_check(k))
           return false;
       }
-      AccountKeys inAccountKeys;
-      std::string hash = boost::algorithm::unhex(keys[0]);
-      std::copy(hash.begin(), hash.end(), inAccountKeys.spendSecretKey.data);
-      hash = boost::algorithm::unhex(keys[1]);
-      std::copy(hash.begin(), hash.end(), inAccountKeys.viewSecretKey.data);
-      Crypto::secret_key_to_public_key(inAccountKeys.spendSecretKey, inAccountKeys.address.spendPublicKey);
-      Crypto::secret_key_to_public_key(inAccountKeys.viewSecretKey, inAccountKeys.address.viewPublicKey);
-      m_wallet->initWithKeys(inAccountKeys, password);
+      std::string hash = boost::algorithm::unhex(in_keys[0]);
+      std::copy(hash.begin(), hash.end(), accountKeys.spendSecretKey.data);
+      hash = boost::algorithm::unhex(in_keys[1]);
+      std::copy(hash.begin(), hash.end(), accountKeys.viewSecretKey.data);
+      Crypto::secret_key_to_public_key(accountKeys.spendSecretKey, accountKeys.address.spendPublicKey);
+      Crypto::secret_key_to_public_key(accountKeys.viewSecretKey, accountKeys.address.viewPublicKey);
+      m_wallet->initWithKeys(accountKeys, password);
     } else {
       m_wallet->initAndGenerate(password);
     }
@@ -701,12 +701,10 @@ bool simple_wallet::new_wallet(const std::string &wallet_file, const std::string
       throw;
     }
 
-    AccountKeys keys;
-    m_wallet->getAccountKeys(keys);
-
+    m_wallet->getAccountKeys(accountKeys);
     logger(INFO, BRIGHT_WHITE) <<
       "Generated new wallet: " << m_wallet->getAddress() << std::endl <<
-      "view key: " << Common::podToHex(keys.viewSecretKey);
+      "view key: " << Common::podToHex(accountKeys.viewSecretKey);
   }
   catch (const std::exception& e) {
     fail_msg_writer() << "failed to generate new wallet: " << e.what();

@@ -23,8 +23,8 @@ namespace Crypto {
   using std::mutex;
 
   extern "C" {
-#include "crypto-ops.h"
-#include "random.h"
+    #include "crypto-ops.h"
+    #include "random.h"
   }
 
   mutex random_lock;

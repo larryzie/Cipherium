@@ -33,14 +33,14 @@ void fillRandomString(std::string& buf) {
   }
 }
 
-std::string removePort(const std::string& address) {
-  size_t colonPosition = address.rfind(':');
-  if (colonPosition == std::string::npos) {
-    throw std::runtime_error("removePort");
-  }
+//std::string removePort(const std::string& address) {
+//  size_t colonPosition = address.rfind(':');
+//  if (colonPosition == std::string::npos) {
+//    throw std::runtime_error("removePort");
+//  }
 
-  return address.substr(0, colonPosition);
-}
+//  return address.substr(0, colonPosition);
+//}
 
 }
 

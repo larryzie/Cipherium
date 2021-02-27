@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 
 project (miniupnpc C)
 set (MINIUPNPC_VERSION 1.9)
-set (MINIUPNPC_API_VERSION 10)
+set (MINIUPNPC_API_VERSION 11)
 
 if (NOT CMAKE_BUILD_TYPE)
   if (WIN32)
@@ -167,6 +167,8 @@ install (FILES
   igd_desc_parse.h
   upnpreplyparse.h
   upnperrors.h
+  miniupnpctypes.h
+  portlistingparse.h
   declspec.h
   DESTINATION include/miniupnpc
 )

@@ -112,7 +112,7 @@ static void ListRedirections(struct UPNPUrls * urls,
                              struct IGDdatas * data)
 {
 	int r;
-	int i = 0;
+	uint16_t i = 0;
 	char index[6];
 	char intClient[40];
 	char intPort[6];
@@ -152,7 +152,7 @@ static void ListRedirections(struct UPNPUrls * urls,
 			printf("GetGenericPortMappingEntry() returned %d (%s)\n",
 			       r, strupnperror(r));
 		i++;
-	} while(r==0);
+	} while(r==0 && i < 65535);
 }
 
 static void NewListRedirections(struct UPNPUrls * urls,

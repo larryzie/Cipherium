@@ -162,6 +162,7 @@ struct COMMAND_RPC_GET_TX_GLOBAL_OUTPUTS_INDEXES {
     }
   };
 };
+
 //-----------------------------------------------
 struct COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_AMOUNTS_request {
   std::vector<uint64_t> amounts;
@@ -229,6 +230,7 @@ struct COMMAND_RPC_SEND_RAW_TX {
     }
   };
 };
+
 //-----------------------------------------------
 struct COMMAND_RPC_START_MINING {
   struct request {
@@ -249,6 +251,7 @@ struct COMMAND_RPC_START_MINING {
     }
   };
 };
+
 //-----------------------------------------------
 struct COMMAND_RPC_GET_INFO {
   typedef EMPTY_STRUCT request;

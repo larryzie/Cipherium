@@ -30,6 +30,9 @@
 
 #include <stddef.h>
 #include <time.h> 
+#ifdef _WIN32
+#include <sys/timeb.h>
+#endif
 #ifdef __APPLE__
 #include <malloc/malloc.h>
 #else 
@@ -457,44 +460,87 @@ OAES_RET oaes_sprintf(
 	return OAES_RET_SUCCESS;
 }
 
+
 #ifdef OAES_HAVE_ISAAC
-static void oaes_get_seed( char buf[RANDSIZ + 1] )
-{
-	struct timespec timer;
-	struct tm *gmTimer;
-	long * _test = NULL;
+	#ifdef _WIN32
+	static void oaes_get_seed( char buf[RANDSIZ + 1] )
+	{
+		struct timeb timer;
+		struct tm *gmTimer;
+		char * _test = NULL;
 
-	clock_gettime(CLOCK_REALTIME, &timer);
-	gmTimer = gmtime(&timer.tv_sec);	
-	_test = (long *) calloc(sizeof(long), timer.tv_nsec );
-	sprintf( buf, "%04d%02d%02d%02d%02d%02d%09d%p%d",
-		gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
-		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
-		_test + timer.tv_nsec, getpid() );
+		ftime (&timer);
+		gmTimer = gmtime( &timer.time );
+		_test = (char *) calloc( sizeof( char ), timer.millitm );
+		sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
+			gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
+			gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
+			_test + timer.millitm, getpid() );
 
-	if( _test )
-		free( _test );
-}
+		if( _test )
+			free( _test );
+	}
+	#else
+	static void oaes_get_seed( char buf[RANDSIZ + 1] )
+	{
+		struct timespec timer;
+		struct tm *gmTimer;
+		long * _test = NULL;
+
+		clock_gettime(CLOCK_REALTIME, &timer);
+		gmTimer = gmtime(&timer.tv_sec);	
+		_test = (long *) calloc(sizeof(long), timer.tv_nsec );
+		sprintf( buf, "%04d%02d%02d%02d%02d%02d%09d%p%d",
+			gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
+			gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
+			_test + timer.tv_nsec, getpid() );
+
+		if( _test )
+			free( _test );
+	}
+	#endif // _WIN32
 #else
-static uint32_t oaes_get_seed(void)
-{
-	struct timespec timer;
-	struct tm *gmTimer;
-	long * _test = NULL;
-	uint32_t _ret = 0;
+	#ifdef _WIN32
+	static uint32_t oaes_get_seed(void)
+	{
+		struct timeb timer;
+		struct tm *gmTimer;
+		char * _test = NULL;
+		uint32_t _ret = 0;
+	
+		ftime (&timer);
+		gmTimer = gmtime( &timer.time );
+		_test = (char *) calloc( sizeof( char ), timer.millitm );
+		_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
+			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.millitm +
+			(uintptr_t) ( _test + timer.millitm ) + getpid());
 
-	clock_gettime(CLOCK_REALTIME, &timer);
-	gmTimer = gmtime(&timer.tv_sec);
-	_test = (long *) calloc(sizeof(long), timer.tv_nsec );
-	_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
+		if( _test )
+			free( _test );
+
+		return _ret;
+	}
+	#else
+	static uint32_t oaes_get_seed(void)
+	{
+		struct timespec timer;
+		struct tm *gmTimer;
+		long * _test = NULL;
+		uint32_t _ret = 0;
+
+		clock_gettime(CLOCK_REALTIME, &timer);
+		gmTimer = gmtime(&timer.tv_sec);
+		_test = (long *) calloc(sizeof(long), timer.tv_nsec );
+		_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
 			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
 			(uintptr_t) ( _test + timer.tv_nsec ) + getpid());
 
-	if( _test )
-		free( _test );
+		if( _test )
+			free( _test );
 
-	return _ret;	
-}
+		return _ret;	
+	}
+	#endif // _WIN32
 #endif // OAES_HAVE_ISAAC
 
 static OAES_RET oaes_key_destroy( oaes_key ** key )

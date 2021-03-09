@@ -42,6 +42,6 @@ To build from developer command prompt, change to a directory where this file is
 mkdir build
 cd build
 cmake -G "Visual Studio 15 Win64" ..
-msbuild Cryptonote.sln /p:Configuration=Release
+msbuild Cipherium.sln /p:Configuration=Release
 ```
 

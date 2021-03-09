@@ -30,7 +30,6 @@
 
 #include <stddef.h>
 #include <time.h> 
-#include <sys/timeb.h>
 #ifdef __APPLE__
 #include <malloc/malloc.h>
 #else 
@@ -454,47 +453,47 @@ OAES_RET oaes_sprintf(
 		if( _i && 0 == ( _i + 1 ) % OAES_BLOCK_SIZE )
 			strcat( buf, "\n" );
 	}
-	
+
 	return OAES_RET_SUCCESS;
 }
 
 #ifdef OAES_HAVE_ISAAC
 static void oaes_get_seed( char buf[RANDSIZ + 1] )
 {
-	struct timeb timer;
+	struct timespec timer;
 	struct tm *gmTimer;
-	char * _test = NULL;
-	
-	ftime (&timer);
-	gmTimer = gmtime( &timer.time );
-	_test = (char *) calloc( sizeof( char ), timer.millitm );
-	sprintf( buf, "%04d%02d%02d%02d%02d%02d%03d%p%d",
+	long * _test = NULL;
+
+	clock_gettime(CLOCK_REALTIME, &timer);
+	gmTimer = gmtime(&timer.tv_sec);	
+	_test = (long *) calloc(sizeof(long), timer.tv_nsec );
+	sprintf( buf, "%04d%02d%02d%02d%02d%02d%09d%p%d",
 		gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
-		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
-		_test + timer.millitm, getpid() );
-	
+		gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
+		_test + timer.tv_nsec, getpid() );
+
 	if( _test )
 		free( _test );
 }
 #else
 static uint32_t oaes_get_seed(void)
 {
-	struct timeb timer;
+	struct timespec timer;
 	struct tm *gmTimer;
-	char * _test = NULL;
+	long * _test = NULL;
 	uint32_t _ret = 0;
-	
-	ftime (&timer);
-	gmTimer = gmtime( &timer.time );
-	_test = (char *) calloc( sizeof( char ), timer.millitm );
+
+	clock_gettime(CLOCK_REALTIME, &timer);
+	gmTimer = gmtime(&timer.tv_sec);
+	_test = (long *) calloc(sizeof(long), timer.tv_nsec );
 	_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
-			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.millitm +
-			(uintptr_t) ( _test + timer.millitm ) + getpid());
+			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
+			(uintptr_t) ( _test + timer.tv_nsec ) + getpid());
 
 	if( _test )
 		free( _test );
-	
-	return _ret;
+
+	return _ret;	
 }
 #endif // OAES_HAVE_ISAAC
 

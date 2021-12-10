@@ -75,6 +75,11 @@ void AsyncConsoleReader::consoleThread() {
     if (!m_queue.push(line)) {
       break;
     }
+    
+    m_history.push_back(line);
+    if(m_history.size() > 100) {
+      m_history.erase(m_history.begin());
+    }
   }
 }
 

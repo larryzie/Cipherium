@@ -36,6 +36,7 @@ private:
   std::atomic<bool> m_stop;
   std::thread m_thread;
   BlockingQueue<std::string> m_queue;
+  std::vector<std::string> m_history;
 };
 
 

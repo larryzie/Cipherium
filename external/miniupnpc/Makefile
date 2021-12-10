@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.107 2014/01/31 14:19:12 nanard Exp $
+# $Id: Makefile,v 1.108 2014/06/10 09:51:33 nanard Exp $
 # MiniUPnP Project
 # http://miniupnp.free.fr/
 # http://miniupnp.tuxfamily.org/
@@ -85,7 +85,7 @@ LIBRARY = libminiupnpc.a
 ifeq ($(OS), Darwin)
   SHAREDLIBRARY = libminiupnpc.dylib
   SONAME = $(basename $(SHAREDLIBRARY)).$(APIVERSION).dylib
-  CFLAGS := -DMACOSX -D_DARWIN_C_SOURCE $(CFLAGS)
+  CFLAGS := -D_DARWIN_C_SOURCE $(CFLAGS)
 else
 ifeq ($(JARSUFFIX), win32)
   SHAREDLIBRARY = miniupnpc.dll
@@ -174,6 +174,7 @@ validateupnpreplyparse:	testupnpreplyparse testupnpreplyparse.sh
 
 clean:
 	$(RM) $(LIBRARY) $(SHAREDLIBRARY) $(EXECUTABLES) $(OBJS) miniupnpcstrings.h
+	$(RM) $(EXECUTABLES_ADDTESTS)
 	# clean python stuff
 	$(RM) pythonmodule pythonmodule3
 	$(RM) validateminixml validateminiwget validateupnpreplyparse

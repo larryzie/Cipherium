@@ -37,9 +37,9 @@ public:
 
   // Constructor from C array.
   // Copies string from 'stringData' to 'StringBuffer'.
-  // The behavior is undefined unless ('stringData' != 'nullptr' || 'stringSize' == 0) && 'stringSize' <= 'MAXIMUM_SIZE'. Input state can be malformed using poiner conversions.
+  // The behavior is undefined unless ('stringData' != 'nullptr' || 'stringSize' == 0) && 'stringSize' <= 'MAXIMUM_SIZE'. Input state can be malformed using pointer conversions.
   template<Size stringSize> explicit StringBuffer(const Object(&stringData)[stringSize]) : size(stringSize - 1) {
-    assert(/*stringData != nullptr || */size == 0);
+  //  assert(stringData != nullptr || size == 0);
     assert(size <= MAXIMUM_SIZE);
     memcpy(data, stringData, size);
   }

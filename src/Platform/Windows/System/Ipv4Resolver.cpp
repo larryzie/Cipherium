@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Ipv4Resolver.h"
+#include <stdexcept>
 #include <cassert>
 #include <random>
 #ifndef WIN32_LEAN_AND_MEAN

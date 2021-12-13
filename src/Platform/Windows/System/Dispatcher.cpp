@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "Dispatcher.h"
+#include <stdexcept>
 #include <cassert>
 #include <string>
 #ifndef WIN32_LEAN_AND_MEAN

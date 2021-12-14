@@ -462,11 +462,11 @@ OAES_RET oaes_sprintf(
 
 
 #ifdef OAES_HAVE_ISAAC
-	#ifdef _WIN32
 	static void oaes_get_seed( char buf[RANDSIZ + 1] )
 	{
-		struct timeb timer;
 		struct tm *gmTimer;
+	  #ifdef _WIN32
+		struct timeb timer;
 		char * _test = NULL;
 
 		ftime (&timer);
@@ -476,15 +476,8 @@ OAES_RET oaes_sprintf(
 			gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
 			gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.millitm,
 			_test + timer.millitm, getpid() );
-
-		if( _test )
-			free( _test );
-	}
-	#else
-	static void oaes_get_seed( char buf[RANDSIZ + 1] )
-	{
+	  #else
 		struct timespec timer;
-		struct tm *gmTimer;
 		long * _test = NULL;
 
 		clock_gettime(CLOCK_REALTIME, &timer);
@@ -494,19 +487,18 @@ OAES_RET oaes_sprintf(
 			gmTimer->tm_year + 1900, gmTimer->tm_mon + 1, gmTimer->tm_mday,
 			gmTimer->tm_hour, gmTimer->tm_min, gmTimer->tm_sec, timer.tv_nsec,
 			_test + timer.tv_nsec, getpid() );
-
+	  #endif // _WIN32
 		if( _test )
 			free( _test );
 	}
-	#endif // _WIN32
 #else
-	#ifdef _WIN32
 	static uint32_t oaes_get_seed(void)
 	{
-		struct timeb timer;
-		struct tm *gmTimer;
-		char * _test = NULL;
 		uint32_t _ret = 0;
+		struct tm *gmTimer;
+   	  #ifdef _WIN32
+		struct timeb timer;
+		char * _test = NULL;
 	
 		ftime (&timer);
 		gmTimer = gmtime( &timer.time );
@@ -514,19 +506,9 @@ OAES_RET oaes_sprintf(
 		_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
 			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.millitm +
 			(uintptr_t) ( _test + timer.millitm ) + getpid());
-
-		if( _test )
-			free( _test );
-
-		return _ret;
-	}
-	#else
-	static uint32_t oaes_get_seed(void)
-	{
+	  #else
 		struct timespec timer;
-		struct tm *gmTimer;
 		long * _test = NULL;
-		uint32_t _ret = 0;
 
 		clock_gettime(CLOCK_REALTIME, &timer);
 		gmTimer = gmtime(&timer.tv_sec);
@@ -534,13 +516,12 @@ OAES_RET oaes_sprintf(
 		_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
 			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
 			(uintptr_t) ( _test + timer.tv_nsec ) + getpid());
-
+	  #endif // _WIN32
 		if( _test )
 			free( _test );
 
-		return _ret;	
+		return _ret;
 	}
-	#endif // _WIN32
 #endif // OAES_HAVE_ISAAC
 
 static OAES_RET oaes_key_destroy( oaes_key ** key )

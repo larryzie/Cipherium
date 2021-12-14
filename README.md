@@ -5,14 +5,14 @@ This is a codebase based on [CryptoNote](https://cryptonote.org) cryptocurrency 
 
 ## Cipherium Binaries
 
-* Linux 64 bit: [Cipherium_linux_x64_v1_0_0.tar.gz](http://cipherium.org/downloads.html)
-* Windows 64 bit: [Cipherium_win_x64_v1_0_0.zip](http://cipherium.org/downloads.html)
+* Linux 64 bit: [Cipherium_linux_x64_v1_0_3.tar.gz](http://cipherium.org/downloads.html)
+* Windows 64 bit: [Cipherium_win_x64_v1_0_3.zip](http://cipherium.org/downloads.html)
 
 ## Building Cipherium
 
 ### On *nix
 
-Dependencies: GCC 7.1.0 or later, CMake 3.12.0 or later, and Boost 1.55.
+Dependencies: GCC 7.1.0 or later, CMake 3.12.0 or later, and Boost 1.68.0.
 
 You may download them from:
 
@@ -31,7 +31,7 @@ To build, change to a directory where this file is located, and run `make`. The 
 * Building with Clang: it may be possible to use Clang instead of GCC, but this may not work everywhere. To build, run `export CC=clang CXX=clang++` before running `make`.
 
 ### On Windows
-Dependencies: MSVC 2013 or later, CMake 2.8.6 or later, and Boost 1.55. You may download them from:
+Dependencies: MSVC 2017 or later, CMake 3.12.0 or later, and Boost 1.68.0. You may download them from:
 
 * https://visualstudio.com/vs/community/
 * http://www.cmake.org/
@@ -41,7 +41,7 @@ To build from developer command prompt, change to a directory where this file is
 ```
 mkdir build
 cd build
-cmake -G "Visual Studio 16 2019" ..
+cmake -G "Visual Studio 16 2019 Win64" ..
 msbuild Cipherium.sln /p:Configuration=Release
 ```
 

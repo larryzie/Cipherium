@@ -299,7 +299,6 @@ private:
   Crypto::Hash m_lastBlockHash;
 };
 
-
 Blockchain::Blockchain(const Currency& currency, tx_memory_pool& tx_pool, ILogger& logger) :
 logger(logger, "Blockchain"),
 m_currency(currency),
@@ -1776,6 +1775,12 @@ bool Blockchain::pushBlock(const Block& blockData, const std::vector<Transaction
   pushBlock(block);
 
   auto block_processing_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - blockProcessingStart).count();
+
+  if(block.height > 0) {
+    if(!(block.height % 20)) {
+      logger(INFO, BRIGHT_GREEN) << "Synced block " << block.height << ENDL;
+    }
+  }
 
   logger(DEBUGGING) <<
     "+++++ BLOCK SUCCESSFULLY ADDED" << ENDL << "id:\t" << blockHash

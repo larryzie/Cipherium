@@ -11,6 +11,7 @@
 
 #include "Common/ObserverManager.h"
 #include "Common/Util.h"
+#include "CryptoNoteCore/ICore.h"
 #include "CryptoNoteCore/BlockIndex.h"
 #include "CryptoNoteCore/Checkpoints.h"
 #include "CryptoNoteCore/Currency.h"
@@ -39,7 +40,7 @@ namespace CryptoNote {
   using CryptoNote::BlockInfo;
   class Blockchain : public CryptoNote::ITransactionValidator {
   public:
-    Blockchain(const Currency& currency, tx_memory_pool& tx_pool, Logging::ILogger& logger);
+    Blockchain(const Currency& currency, tx_memory_pool& tx_pool, ICore& core, Logging::ILogger& logger);
 
     bool addObserver(IBlockchainStorageObserver* observer);
     bool removeObserver(IBlockchainStorageObserver* observer);
@@ -218,6 +219,7 @@ namespace CryptoNote {
     typedef google::sparse_hash_map<uint64_t, std::vector<std::pair<TransactionIndex, uint16_t>>> outputs_container; //Crypto::Hash - tx hash, size_t - index of out in transaction
     typedef google::sparse_hash_map<uint64_t, std::vector<MultisignatureOutputUsage>> MultisignatureOutputsContainer;
 
+    ICore& m_core;
     const Currency& m_currency;
     tx_memory_pool& m_tx_pool;
     std::recursive_mutex m_blockchain_lock; // TODO: add here reader/writer lock
@@ -358,4 +360,3 @@ namespace CryptoNote {
     return true;
   }
 }
-

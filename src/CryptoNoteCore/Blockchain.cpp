@@ -11,6 +11,7 @@
 #include "Common/ShuffleGenerator.h"
 #include "Common/StdInputStream.h"
 #include "Common/StdOutputStream.h"
+#include "CryptoNoteProtocol/CryptoNoteProtocolHandler.h"
 #include "Rpc/CoreRpcServerCommandsDefinitions.h"
 #include "Serialization/BinarySerializationTools.h"
 #include "CryptoNoteTools.h"
@@ -299,10 +300,11 @@ private:
   Crypto::Hash m_lastBlockHash;
 };
 
-Blockchain::Blockchain(const Currency& currency, tx_memory_pool& tx_pool, ILogger& logger) :
+Blockchain::Blockchain(const Currency& currency, tx_memory_pool& tx_pool, ICore& core, ILogger& logger) :
 logger(logger, "Blockchain"),
 m_currency(currency),
 m_tx_pool(tx_pool),
+m_core(core),
 m_current_block_cumul_sz_limit(0),
 m_is_in_checkpoint_zone(false),
 m_checkpoints(logger) {
@@ -1778,17 +1780,21 @@ bool Blockchain::pushBlock(const Block& blockData, const std::vector<Transaction
 
   if(block.height > 0) {
     if(!(block.height % 20)) {
-      logger(INFO, BRIGHT_GREEN) << "Synced block " << block.height << ENDL;
+      CryptoNote::CryptoNoteProtocolHandler* protocol = reinterpret_cast <CryptoNote::CryptoNoteProtocolHandler*> (m_core.get_protocol());
+      int64_t diff = static_cast<int64_t>(protocol->getObservedHeight()) - static_cast<int64_t>(block.height);
+      logger(INFO, BRIGHT_GREEN) << "Synced block " << block.height << " of " << protocol->getObservedHeight() << " -- (" 
+      << std::abs(diff) / (24 * 60 * 60 / 480) << " days " 
+      << (diff >= 0 ? std::string("behind)") : std::string("ahead)")) << std::endl;
     }
   }
 
   logger(DEBUGGING) <<
-    "+++++ BLOCK SUCCESSFULLY ADDED" << ENDL << "id:\t" << blockHash
-    << ENDL << "PoW:\t" << proof_of_work
-    << ENDL << "HEIGHT " << block.height << ", difficulty:\t" << currentDifficulty
-    << ENDL << "block reward: " << m_currency.formatAmount(reward) << ", fee = " << m_currency.formatAmount(fee_summary)
+    "+++++ BLOCK SUCCESSFULLY ADDED" << std::endl << "id:\t" << blockHash
+    << std::endl << "PoW:\t" << proof_of_work
+    << std::endl << "HEIGHT " << block.height << ", difficulty:\t" << currentDifficulty
+    << std::endl << "block reward: " << m_currency.formatAmount(reward) << ", fee = " << m_currency.formatAmount(fee_summary)
     << ", coinbase_blob_size: " << coinbase_blob_size << ", cumulative size: " << cumulative_block_size
-    << ", " << block_processing_time << "(" << target_calculating_time << "/" << longhash_calculating_time << ")ms";
+    << ", " << block_processing_time << "(" << target_calculating_time << "/" << longhash_calculating_time << ")ms" << std::endl;
 
   bvc.m_added_to_main_chain = true;
 

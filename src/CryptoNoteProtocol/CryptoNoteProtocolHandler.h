@@ -82,8 +82,6 @@ namespace CryptoNote
     int processObjects(CryptoNoteConnectionContext& context, const std::vector<block_complete_entry>& blocks);
     Logging::LoggerRef logger;
 
-  private:
-
     System::Dispatcher& m_dispatcher;
     ICore& m_core;
     const Currency& m_currency;

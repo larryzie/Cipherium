@@ -16,15 +16,15 @@ const size_t   CRYPTONOTE_MAX_TX_SIZE                        = 1000000000;
 
 /* Currency-specific address prefix */
 const uint64_t CRYPTONOTE_PUBLIC_ADDRESS_BASE58_PREFIX       = 0x7e6d;
-//Choose maturity period for your currency
+/* Choose maturity period for currency */
 const size_t   CRYPTONOTE_MINED_MONEY_UNLOCK_WINDOW          = 60;
 const uint64_t CRYPTONOTE_BLOCK_FUTURE_TIME_LIMIT            = 60 * 60 * 2;
 
 const size_t   BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW             = 60;
 
 /* Specify total number of available coins
- * ((uint64_t)(-1)) equals to 18446744073709551616 coins
- * or you can define number explicitly UINT64_C(858986905600000000)
+ * ((uint64_t)(-1)) equals 18446744073709551616 coins
+ * or define number explicitly UINT64_C(858986905600000000)
  * 2^50 = 1125899906842624 = 0x4000000000000 */
 const uint64_t MONEY_SUPPLY                                  = 0x4000000000000;
 const unsigned EMISSION_SPEED_FACTOR                         = 19;
@@ -33,8 +33,8 @@ static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED
 /* Define number of blocks for block size median calculation */
 const size_t   CRYPTONOTE_REWARD_BLOCKS_WINDOW               = 100;
 
-/* size of block (bytes) after which reward for block calculated using block size */
-const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE     = 20000; 
+/* Size of block (bytes) after which reward for block calculated using block size */
+const size_t   CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE     = 20000;
 const size_t   CRYPTONOTE_COINBASE_BLOB_RESERVED_SIZE        = 600;
 
 /* Define number of digits */
@@ -51,7 +51,7 @@ const uint64_t EXPECTED_NUMBER_OF_BLOCKS_PER_DAY             = 24 * 60 * 60 / DI
 /* There are options to tune CryptoNote's difficulty retargeting function, not recommended to change. */
 const size_t   DIFFICULTY_WINDOW                             = EXPECTED_NUMBER_OF_BLOCKS_PER_DAY;
 
-/* timestamps to cut after sorting */
+/* Timestamps to cut after sorting */
 const size_t   DIFFICULTY_CUT                                = 60;  
 const size_t   DIFFICULTY_LAG                                = 15;
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
@@ -63,13 +63,13 @@ const uint64_t MAX_BLOCK_SIZE_GROWTH_SPEED_DENOMINATOR       = 365 * 24 * 60 * 6
 const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS     = 1;
 const uint64_t CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_SECONDS    = DIFFICULTY_TARGET * CRYPTONOTE_LOCKED_TX_ALLOWED_DELTA_BLOCKS;
 
-/* seconds, one day */
+/* Seconds per day */
 const uint64_t CRYPTONOTE_MEMPOOL_TX_LIVETIME                = 60 * 60 * 24;
 
-/* seconds, one week */
+/* Seconds per week */
 const uint64_t CRYPTONOTE_MEMPOOL_TX_FROM_ALT_BLOCK_LIVETIME = 60 * 60 * 24 * 7;
 
-/*  CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL * CRYPTONOTE_MEMPOOL_TX_LIVETIME = time to forget tx */
+/* CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL * CRYPTONOTE_MEMPOOL_TX_LIVETIME = time to forget tx */
 const uint64_t CRYPTONOTE_NUMBER_OF_PERIODS_TO_FORGET_TX_DELETED_FROM_POOL = 7;  
 
 const size_t   FUSION_TX_MAX_SIZE                            = CRYPTONOTE_BLOCK_GRANTED_FULL_REWARD_ZONE * 30 / 100;
@@ -85,7 +85,7 @@ const char     CRYPTONOTE_BLOCKCHAIN_INDICES_FILENAME[]      = "blockchainindice
 const char     MINER_CONFIG_FILE_NAME[]                      = "miner_conf.json";
 } /* parameters */
 
-/* executable name */
+/* Executable name */
 const char     CRYPTONOTE_NAME[]                             = "cipherium";
 const char     GENESIS_COINBASE_TX_HEX[] = "013c01ff00018080808008029b2e4c0281c0b02e7c53291a94d1d0cbff8883f8024f5142ee494ffbbd088071210167975c6de2041710b574612f79a7e73c17db935bf7747c6c8a58c5685321cf6a";
 

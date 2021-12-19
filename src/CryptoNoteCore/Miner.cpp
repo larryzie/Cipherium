@@ -215,7 +215,9 @@ namespace CryptoNote
       m_threads.push_back(std::thread(std::bind(&miner::worker_thread, this, i)));
     }
 
-    logger(INFO) << "Mining has started with " << threads_count << " threads, good luck!";
+    logger(INFO) << "Mining initiated with " << threads_count
+    << (threads_count <= 1 ? std::string(" thread.") : std::string(" threads."))
+    << " Logging will print alert to console for each successfully mined block." << std::endl;
     return true;
   }
   

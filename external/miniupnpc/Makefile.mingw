@@ -50,11 +50,11 @@ dll/upnpc.o:	upnpc.o
 	echo $@ generated with $<
 
 .c.o:
-	$(CC) $(CFLAGS) -DSTATICLIB -c -o $@ $<
+	$(CC) $(CFLAGS) -DMINIUPNP_STATICLIB -c -o $@ $<
 	$(CC) $(CFLAGS) -DMINIUPNP_EXPORTS -c -o dll/$@ $<
 
 upnpc.o:
-	$(CC) $(CFLAGS) -DSTATICLIB -c -o $@ $<
+	$(CC) $(CFLAGS) -DMINIUPNP_STATICLIB -c -o $@ $<
 	$(CC) $(CFLAGS) -c -o dll/$@ $<
 
 # --enable-stdcall-fixup
@@ -88,4 +88,3 @@ testminixml:	minixml.o igd_desc_parse.o testminixml.c
 upnpreplyparse.o:	upnpreplyparse.c upnpreplyparse.h minixml.h
 
 upnpcommands.o:	upnpcommands.c upnpcommands.h upnpreplyparse.h miniupnpc.h portlistingparse.h
-

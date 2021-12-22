@@ -41,7 +41,6 @@ To build from developer command prompt, change to a directory where this file is
 ```
 mkdir build
 cd build
-cmake -G "Visual Studio 16 2019 Win64" ..
+cmake -G "Visual Studio 16 2019" ..
 msbuild Cipherium.sln /p:Configuration=Release
 ```
-

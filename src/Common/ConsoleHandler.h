@@ -36,7 +36,6 @@ private:
   std::atomic<bool> m_stop;
   std::thread m_thread;
   BlockingQueue<std::string> m_queue;
-  std::vector<std::string> m_history;
 };
 
 
@@ -54,7 +53,8 @@ public:
 
   void start(bool startThread = true, const std::string& prompt = "", Console::Color promptColor = Console::Color::Default);
   void stop();
-  void wait(); 
+  void wait();
+  void pushHistory(std::string& line);
 
 private:
 
@@ -67,6 +67,9 @@ private:
   std::thread m_thread;
   std::string m_prompt;
   Console::Color m_promptColor = Console::Color::Default;
+  std::vector<std::string> m_history;
+  std::vector<std::string>::iterator m_iter;
+  uint32_t m_maxHistory = 100;
   CommandHandlersMap m_handlers;
   AsyncConsoleReader m_consoleReader;
 };

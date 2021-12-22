@@ -75,11 +75,6 @@ void AsyncConsoleReader::consoleThread() {
     if (!m_queue.push(line)) {
       break;
     }
-    
-    m_history.push_back(line);
-    if(m_history.size() > 100) {
-      m_history.erase(m_history.begin());
-    }
   }
 }
 
@@ -211,27 +206,37 @@ void ConsoleHandler::handlerThread() {
           Console::setTextColor(m_promptColor);
         }
 
-        std::cout << m_prompt;
-        std::cout.flush();
+        std::cout << m_prompt << std::flush;
 
         if (m_promptColor != Color::Default) {
           Console::setTextColor(Color::Default);
         }
       }
 
-      if (!m_consoleReader.getline(line)) {
-        break;
+      if (m_consoleReader.getline(line)) {
+        pushHistory(line);
       }
 
+      if(m_iter == m_history.end()) break;
+
+      line = *m_iter;
       boost::algorithm::trim(line);
       if (!line.empty()) {
         handleCommand(line);
       }
-
+      m_iter = m_history.end();
     } catch (std::exception&) {
       // ignore errors
     }
   }
+}
+
+void ConsoleHandler::pushHistory(std::string& line) {
+  m_history.push_back(line);
+    if(m_history.size() > m_maxHistory) {
+      m_history.erase(m_history.begin());
+    }
+  m_iter = prev(m_history.end(), 1);
 }
 
 }

@@ -1,5 +1,11 @@
-$Id: Changelog.txt,v 1.196 2014/07/01 13:01:17 nanard Exp $
+$Id: Changelog.txt,v 1.198 2014/09/11 14:13:31 nanard Exp $
 miniUPnP client Changelog.
+
+2014/09/11:
+  use remoteHost arg of DeletePortMapping  
+
+2014/09/06:
+  Fix python3 build
 
 2014/07/01:
   Fix parsing of IGD2 root descriptions
@@ -591,4 +597,3 @@ VERSION 1.0 :
 
 2006/07/19:
   using GetCommonLinkProperties to get down/upload bitrate
-

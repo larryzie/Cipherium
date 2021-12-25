@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.10.2)
 
 set(VERSION "1.1.0.0")
 # $Format:Packaged from commit %H%nset(COMMIT %h)%nset(REFS "%d")$

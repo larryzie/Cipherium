@@ -22,7 +22,7 @@ const std::string BRIGHT_CYAN = "\x1F""BRIGHT_CYAN\x1F";
 const std::string BRIGHT_MAGENTA = "\x1F""BRIGHT_MAGENTA\x1F";
 const std::string DEFAULT = "\x1F""DEFAULT\x1F";
 
-const char ILogger::COLOR_DELIMETER = '\x1F';
+const char ILogger::COLOR_DELIMITER = '\x1F';
 
 const std::array<std::string, 6> ILogger::LEVEL_NAMES = {
   {"FATAL",

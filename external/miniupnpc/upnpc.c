@@ -298,7 +298,7 @@ RemoveRedirect(struct UPNPUrls * urls,
                struct IGDdatas * data,
 		       const char * eport,
 		       const char * proto,
-			   const char * remoteHost)
+		       const char * remoteHost)
 {
 	int r;
 	if(!proto || !eport)

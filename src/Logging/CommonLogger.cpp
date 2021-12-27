@@ -47,8 +47,8 @@ void CommonLogger::operator()(const std::string& category, Level level, boost::p
     std::string body2 = body;
     if (!pattern.empty()) {
       size_t insertPos = 0;
-      if (!body2.empty() && body2[0] == ILogger::COLOR_DELIMETER) {
-        size_t delimPos = body2.find(ILogger::COLOR_DELIMETER, 1);
+      if (!body2.empty() && body2[0] == ILogger::COLOR_DELIMITER) {
+        size_t delimPos = body2.find(ILogger::COLOR_DELIMITER, 1);
         if (delimPos != std::string::npos) {
           insertPos = delimPos + 1;
         }

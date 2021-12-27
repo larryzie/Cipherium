@@ -39,7 +39,7 @@ extern const std::string DEFAULT;
 
 class ILogger {
 public:
-  const static char COLOR_DELIMETER;
+  const static char COLOR_DELIMITER;
 
   const static std::array<std::string, 6> LEVEL_NAMES;
 

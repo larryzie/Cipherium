@@ -23,7 +23,7 @@ void StreamLogger::doLogString(const std::string& message) {
     std::lock_guard<std::mutex> lock(mutex);
     bool readingText = true;
     for (size_t charPos = 0; charPos < message.size(); ++charPos) {
-      if (message[charPos] == ILogger::COLOR_DELIMETER) {
+      if (message[charPos] == ILogger::COLOR_DELIMITER) {
         readingText = !readingText;
       } else if (readingText) {
         *stream << message[charPos];

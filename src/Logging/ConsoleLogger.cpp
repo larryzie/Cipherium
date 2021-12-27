@@ -41,8 +41,8 @@ void ConsoleLogger::doLogString(const std::string& message) {
     { DEFAULT, Color::Default }
   };
 
-  for (size_t charPos = 0; charPos < message.size(); ++charPos) {
-    if (message[charPos] == ILogger::COLOR_DELIMETER) {
+  for (size_t charPos = 0; charPos < message.size(); charPos++) {
+    if (message[charPos] == ILogger::COLOR_DELIMITER) {
       readingText = !readingText;
       color += message[charPos];
       if (readingText) {
@@ -52,14 +52,14 @@ void ConsoleLogger::doLogString(const std::string& message) {
         color.clear();
       }
     } else if (readingText) {
+      if (changedColor && charPos == message.size() - 1) {
+        Common::Console::setTextColor(Color::Default);
+        changedColor = false;
+      }
       std::cout << message[charPos];
     } else {
       color += message[charPos];
     }
-  }
-
-  if (changedColor) {
-    Common::Console::setTextColor(Color::Default);
   }
 }
 

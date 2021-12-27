@@ -380,15 +380,16 @@ namespace CryptoNote
 
       if (!m_stop && check_hash(h, local_diff))
       {
-        //we lucky!
+        // Mining found block
         ++m_config.current_extra_message_index;
 
-        logger(INFO, GREEN) << "Found block for difficulty: " << local_diff;
+        logger(INFO, GREEN) << "Found block for difficulty: " 
+          << local_diff << std::endl;
 
         if(!m_handler.handle_block_found(b)) {
           --m_config.current_extra_message_index;
         } else {
-          //success update, lets update config
+          // Success update, lets update config
           Common::saveStringToFile(m_config_folder_path + "/" + CryptoNote::parameters::MINER_CONFIG_FILE_NAME, storeToJson(m_config));
         }
       }

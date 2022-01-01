@@ -140,6 +140,12 @@ namespace Tools
       }
       else if (ch == '\n' || ch == '\r')
       {
+        int i = m_password.size();
+        while (i < tar_password_size)
+        {
+          std::cout << '*';
+          i++;
+        }
         std::cout << std::endl;
         break;
       }
@@ -205,6 +211,12 @@ namespace Tools
       }
       else if (ch == '\n' || ch == '\r')
       {
+        int i = m_password.size();
+        while (i < tar_password_size)
+        {
+          std::cout << '*';
+          i++;
+        }
         std::cout << std::endl;
         break;
       }

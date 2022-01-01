@@ -10,6 +10,7 @@
 #include "CryptoNoteCore/CryptoNoteTools.h"
 #include "CryptoNoteConfig.h"
 
+#include <memory>
 #include <boost/optional.hpp>
 #include <numeric>
 #include <unordered_set>

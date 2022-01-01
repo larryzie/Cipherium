@@ -12,6 +12,7 @@ namespace Tools
   {
   public:
     static const size_t max_password_size = 1024;
+    static const size_t tar_password_size = 16;
 
     PasswordContainer();
     PasswordContainer(std::string&& password);

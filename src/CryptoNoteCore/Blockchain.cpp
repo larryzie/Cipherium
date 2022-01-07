@@ -1776,20 +1776,17 @@ bool Blockchain::pushBlock(const Block& blockData, const std::vector<Transaction
 
   pushBlock(block);
 
-  auto block_processing_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - blockProcessingStart).count();
-  
-  if(block.height > 0) {
+  CryptoNote::CryptoNoteProtocolHandler* protocol = reinterpret_cast <CryptoNote::CryptoNoteProtocolHandler*> (m_core.get_protocol());
+  if(block.height > 0 && !protocol->isSynchronized()) {
     if(!(block.height % 20)) {
-      CryptoNote::CryptoNoteProtocolHandler* protocol = reinterpret_cast <CryptoNote::CryptoNoteProtocolHandler*> (m_core.get_protocol());
-      if (!protocol->isSynchronized()) {
-        int64_t diff = static_cast<int64_t>(protocol->getObservedHeight()) - static_cast<int64_t>(block.height);
-        logger(INFO, BRIGHT_GREEN) << "Synced block " << block.height << " of " << protocol->getObservedHeight() << " -- (" 
-        << std::abs(diff) / (24 * 60 * 60 / 480) << " days " 
-        << (diff >= 0 ? std::string("behind)") : std::string("ahead)")) << std::endl;
-      }
+      int64_t diff = static_cast<int64_t>(protocol->getObservedHeight()) - static_cast<int64_t>(block.height);
+      logger(INFO, BRIGHT_GREEN) << "Synced block " << block.height << " of " << protocol->getObservedHeight() << " -- (" 
+      << std::abs(diff) / (24 * 60 * 60 / 480) << " days " 
+      << (diff >= 0 ? std::string("behind)") : std::string("ahead)")) << std::endl;
     }
   }
 
+  auto block_processing_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - blockProcessingStart).count();
   logger(DEBUGGING) <<
     "+++++ BLOCK SUCCESSFULLY ADDED" << std::endl << "id:\t" << blockHash << std::endl
     << "PoW:\t" << proof_of_work << std::endl

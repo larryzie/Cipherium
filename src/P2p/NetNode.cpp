@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <fstream>
+#include <sstream>
+#include <string>
 #include <boost/foreach.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -1190,10 +1192,24 @@ namespace CryptoNote
 
   bool NodeServer::log_peerlist()
   {
-    std::list<PeerlistEntry> pl_wite;
+    std::list<PeerlistEntry> pl_white;
     std::list<PeerlistEntry> pl_gray;
-    m_peerlist.get_peerlist_full(pl_gray, pl_wite);
-    logger(INFO) << ENDL << "Peerlist white:" << ENDL << print_peerlist_to_string(pl_wite) << ENDL << "Peerlist gray:" << ENDL << print_peerlist_to_string(pl_gray) ;
+    std::istringstream ss;
+    std::string token;
+
+    m_peerlist.get_peerlist_full(pl_gray, pl_white);
+    ss.str(print_peerlist_to_string(pl_white));
+
+    logger(INFO) << std::endl << "Peerlist white:" << std::endl;
+    while(std::getline(ss, token)) {
+      logger(INFO) << token << std::endl;
+    }
+    logger(INFO) << std::endl << "Peerlist gray:" << std::endl;
+    ss.clear();
+    ss.str(print_peerlist_to_string(pl_gray));
+    while(std::getline(ss, token)) {
+      logger(INFO) << token << std::endl;
+    }
     return true;
   }
   //-----------------------------------------------------------------------------------

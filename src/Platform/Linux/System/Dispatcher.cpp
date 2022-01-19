@@ -124,12 +124,22 @@ Dispatcher::~Dispatcher() {
     timers.pop();
   }
 
-  auto result = close(epoll);
-  assert(result == 0);
-  result = close(remoteSpawnEvent);
-  assert(result == 0);
-  result = pthread_mutex_destroy(reinterpret_cast<pthread_mutex_t*>(this->mutex));
-  assert(result == 0);
+  #ifdef NDEBUG
+  {
+    close(epoll);
+    close(remoteSpawnEvent);
+    pthread_mutex_destroy(reinterpret_cast<pthread_mutex_t*>(this->mutex));    
+  }
+  #else
+  {
+    auto result = close(epoll);
+    assert(result == 0);
+    result = close(remoteSpawnEvent);
+    assert(result == 0);
+    result = pthread_mutex_destroy(reinterpret_cast<pthread_mutex_t*>(this->mutex));
+    assert(result == 0);
+  }
+  #endif
 }
 
 void Dispatcher::clear() {

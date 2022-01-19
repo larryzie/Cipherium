@@ -4,6 +4,8 @@
 
 #include "InterruptedException.h"
 
+#if defined (_WIN32) || defined (_WIN64)
 namespace {
 char suppressMSVCWarningLNK4221;
 }
+#endif

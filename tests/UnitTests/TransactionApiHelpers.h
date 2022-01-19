@@ -44,7 +44,7 @@ namespace {
     return account;
   }
 
-  AccountPublicAddress generateAddress() {
+  inline AccountPublicAddress generateAddress() {
     return generateAccount().getAccountKeys().address;
   }
   
@@ -64,7 +64,7 @@ namespace {
     return keyImage;
   }
 
-  void addTestInput(ITransaction& transaction, uint64_t amount) {
+  inline void addTestInput(ITransaction& transaction, uint64_t amount) {
     KeyInput input;
     input.amount = amount;
     input.keyImage = generateKeyImage();
@@ -73,7 +73,7 @@ namespace {
     transaction.addInput(input);
   }
 
-  TransactionOutputInformationIn addTestKeyOutput(ITransaction& transaction, uint64_t amount,
+  inline TransactionOutputInformationIn addTestKeyOutput(ITransaction& transaction, uint64_t amount,
     uint32_t globalOutputIndex, const AccountKeys& senderKeys = generateAccountKeys()) {
 
     uint32_t index = static_cast<uint32_t>(transaction.addOutput(amount, senderKeys.address));

@@ -800,7 +800,7 @@ build_absolute_url(const char * baseurl, const char * descURL,
 	}
   if(url[0] != '/')
 	  s[n++] = '/';
-	memcpy(s + n, url, 1 - n);
+	memcpy(s + n, url, strlen(url) + 1);
 	return s;
 }
 

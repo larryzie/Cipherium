@@ -90,7 +90,10 @@ protected:
   struct InputInfo {
     TransactionTypes::InputKeyInfo keyInfo;
     WalletRecord* walletRecord = nullptr;
-    KeyPair ephKeys;
+    KeyPair ephKeys {
+      {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+      {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    };
   };
 
   struct OutputToTransfer {

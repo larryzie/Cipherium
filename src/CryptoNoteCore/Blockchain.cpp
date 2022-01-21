@@ -1219,13 +1219,14 @@ bool Blockchain::getRandomOutsByAmount(const COMMAND_RPC_GET_RANDOM_OUTPUTS_FOR_
 }
 
 uint32_t Blockchain::findBlockchainSupplement(const std::vector<Crypto::Hash>& qblock_ids) {
+  uint32_t blockIndex {0};
+
   assert(!qblock_ids.empty());
   assert(qblock_ids.back() == m_blockIndex.getBlockId(0));
 
   std::lock_guard<decltype(m_blockchain_lock)> lk(m_blockchain_lock);
-  uint32_t blockIndex;
-  // assert above guarantees that method returns true
   m_blockIndex.findSupplement(qblock_ids, blockIndex);
+
   return blockIndex;
 }
 

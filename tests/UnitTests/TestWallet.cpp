@@ -701,6 +701,9 @@ TEST_F(WalletApi, transferNegativeAmount) {
 }
 
 TEST_F(WalletApi, transferFromTwoAddresses) {
+  /* Fix This Test. */
+  ASSERT_EQ(0, 1);
+
   generateBlockReward();
   generateBlockReward(alice.createAddress());
   generator.generateEmptyBlocks(currency.minedMoneyUnlockWindow());
@@ -2739,6 +2742,9 @@ TEST_F(WalletApi, getTransactionThrowsIfNotInitialized) {
 TEST_F(WalletApi, getTransactionReturnsCorrectTransaction) {
   const uint64_t MONEY = 2 * SENT + 2 * FEE + 1;
 
+  /* Fix this test. */
+  ASSERT_EQ(0, 1);
+
   generator.getSingleOutputTransaction(parseAddress(aliceAddress), MONEY);
   unlockMoney();
 
@@ -2804,6 +2810,9 @@ TEST_F(WalletApi, getTransactionsReturnsEmptyArrayIfBlockIndexTooBig) {
 }
 
 TEST_F(WalletApi, transferDoesntAppearTwiceAfterIncludingToBlockchain) {
+  /* Fix this test. */
+  ASSERT_EQ(0, 1);
+
   //we generate single output transaction to make sure we'll have change transfer in transaction
   generator.getSingleOutputTransaction(parseAddress(aliceAddress), 2 * SENT + FEE);
   unlockMoney();
@@ -2830,6 +2839,9 @@ TEST_F(WalletApi, transferDoesntAppearTwiceAfterIncludingToBlockchain) {
 }
 
 TEST_F(WalletApi, incomingTransactionToTwoAddressesContainsTransfersForEachAddress) {
+  /* Fix this test. */
+  ASSERT_EQ(0, 1);
+
   //we don't want to produce change
   generator.getSingleOutputTransaction(parseAddress(aliceAddress), 2 * SENT + 2 * FEE);
   unlockMoney();
@@ -3502,6 +3514,8 @@ TEST_F(WalletApi, transferFailsIfNoChangeDestinationAndMultipleSourceAddressesSe
 }
 
 TEST_F(WalletApi, transferSendsChangeToAddress) {
+  /* Fix this Test. */
+  ASSERT_EQ(0, 1);
   const uint64_t MONEY = SENT * 3;
 
   generator.getSingleOutputTransaction(parseAddress(aliceAddress), MONEY);

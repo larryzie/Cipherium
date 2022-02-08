@@ -540,13 +540,20 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
       std::getline(std::cin, userInput);
       boost::algorithm::trim(userInput);
     } while (userInput.empty());
-    logger(INFO) << "Wallet file name: " << userInput << " accepted.";
 
     if (c == 'g' || c == 'G') {
       m_generate_new = userInput;
     } else {
       m_wallet_file_arg = userInput;
+      std::string keys_file, walletFileName;
+      WalletHelper::prepareFileNames(userInput, keys_file, walletFileName);
+      boost::system::error_code ignore;
+      if (!boost::filesystem::exists(walletFileName, ignore)) {
+        fail_msg_writer() << userInput << " was not found";
+        return false;
+      }
     }
+    logger(INFO) << "Wallet file name: " << userInput << " accepted.";
   }
 
   std::string walletFileName;
@@ -612,7 +619,9 @@ bool simple_wallet::init(const boost::program_options::variables_map& vm) {
     if (!writeAddressFile(walletAddressFile, m_wallet->getAddress())) {
       logger(WARNING, BRIGHT_RED) << "Couldn't write wallet address file: " + walletAddressFile;
     }
-  } else {
+  } 
+  else 
+  {
     m_wallet.reset(new WalletLegacy(m_currency, *m_node));
 
     try {

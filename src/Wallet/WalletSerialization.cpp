@@ -651,13 +651,13 @@ void WalletSerializer::loadFlags(bool& details, bool& cache, Common::IInputStrea
 void WalletSerializer::loadWallets(Common::IInputStream& source, CryptoContext& cryptoContext) {
   auto& index = m_walletsContainer.get<RandomAccessIndex>();
 
-  uint64_t count = 0;
+  uint64_t count{0};
   deserializeEncrypted(count, "wallets_count", cryptoContext, source);
   cryptoContext.incIv();
 
-  bool isTrackingMode;
+  bool isTrackingMode{false};
 
-  for (uint64_t i = 0; i < count; ++i) {
+  for (uint64_t i = 0; i < count; i++) {
     WalletRecordDto dto;
     deserializeEncrypted(dto, "", cryptoContext, source);
     cryptoContext.incIv();

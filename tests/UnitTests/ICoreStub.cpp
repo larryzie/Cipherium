@@ -107,7 +107,7 @@ bool ICoreStub::getPoolChanges(const Crypto::Hash& tailBlockId, const std::vecto
     knownSet.insert(txId);
   }
 
-  for (const std::pair<Crypto::Hash, CryptoNote::Transaction>& poolEntry : transactionPool) {
+  for (const std::pair<const Crypto::Hash, CryptoNote::Transaction>& poolEntry : transactionPool) {
     if (knownSet.find(poolEntry.first) == knownSet.end()) {
       addedTxs.push_back(poolEntry.second);
     }

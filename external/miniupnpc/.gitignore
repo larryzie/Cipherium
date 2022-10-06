@@ -25,3 +25,6 @@ testupnpreplyparse
 validateupnpreplyparse
 testportlistingparse
 validateportlistingparse
+listdevices
+testigddescparse
+validateigddescparse

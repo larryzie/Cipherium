@@ -11,6 +11,8 @@
 #include "WalletLegacy/WalletLegacy.h"
 #include "WalletLegacyObserver.h"
 
+#include <thread>
+
 using namespace CryptoNote;
 using namespace Logging;
 

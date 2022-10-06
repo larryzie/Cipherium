@@ -3,9 +3,9 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <future>
+#include <thread>
 #include <System/Context.h>
 #include <System/Dispatcher.h>
-#include <System/Event.h>
 #include <System/Timer.h>
 #include <gtest/gtest.h>
 

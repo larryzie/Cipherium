@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     input.exceptions(ios_base::badbit | ios_base::failbit | ios_base::eofbit);
     if (cmd == "check_scalar") {
       Crypto::EllipticCurveScalar scalar;
-      bool expected, actual;
+      bool expected{false}, actual;
       get(input, scalar, expected);
       actual = check_scalar(scalar);
       if (expected != actual) {
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     } else if (cmd == "generate_key_derivation") {
       Crypto::PublicKey key1;
       Crypto::SecretKey key2;
-      bool expected1, actual1;
+      bool expected1{false}, actual1;
       Crypto::KeyDerivation expected2, actual2;
       get(input, key1, key2, expected1);
       if (expected1) {

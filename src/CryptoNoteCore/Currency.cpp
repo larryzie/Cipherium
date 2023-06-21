@@ -285,7 +285,7 @@ std::string Currency::accountAddressAsString(const AccountPublicAddress& account
 }
 
 bool Currency::parseAccountAddressString(const std::string& str, AccountPublicAddress& addr) const {
-  uint64_t prefix;
+  uint64_t prefix{0};
   if (!CryptoNote::parseAccountAddressString(prefix, addr, str)) {
     return false;
   }

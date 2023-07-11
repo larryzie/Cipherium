@@ -63,7 +63,8 @@ SRCS = igd_desc_parse.c miniupnpc.c minixml.c minisoap.c miniwget.c \
 	     upnperrors.c testigddescparse.c testminiwget.c \
        connecthostport.c portlistingparse.c receivedata.c \
        testportlistingparse.c miniupnpcmodule.c \
-			 minihttptestserver.c
+			 minihttptestserver.c \
+			 listdevices.c
 
 LIBOBJS = miniwget.o minixml.o igd_desc_parse.o minisoap.o \
           miniupnpc.o upnpreplyparse.o upnpcommands.o upnperrors.o \
@@ -251,6 +252,9 @@ upnpc-static:	upnpc.o $(LIBRARY)
 upnpc-shared:	upnpc.o $(SHAREDLIBRARY)
 	$(CC) $(LDFLAGS) -o $@ $^
 
+listdevices:	listdevices.o $(LIBRARY) $(LDLIBS)
+	$(CC) $(LDFLAGS) -o $@ $^
+
 testminixml:	$(TESTMINIXMLOBJS)
 
 testminiwget:	$(TESTMINIWGETOBJS)
@@ -332,7 +336,7 @@ testminiwget.o: miniwget.h declspec.h
 connecthostport.o: connecthostport.h
 portlistingparse.o: portlistingparse.h declspec.h miniupnpctypes.h minixml.h
 receivedata.o: receivedata.h
-testportlistingparse.o: portlistingparse.h declspec.h igd_desc_parse.h upnpcommands.http
-miniupnpcmodule.o: miniupnpc.h declspec.h igd_desc_parse.h upnpcommands.http
-miniupnpcmodule.o: upnpreplyparse.h portlistingparse.h miniupnpctypes.http
+testportlistingparse.o: portlistingparse.h declspec.h igd_desc_parse.h upnpcommands.h
+miniupnpcmodule.o: miniupnpc.h declspec.h igd_desc_parse.h upnpcommands.h
+miniupnpcmodule.o: upnpreplyparse.h portlistingparse.h miniupnpctypes.h
 miniupnpcmodule.o: upnperrors.h 

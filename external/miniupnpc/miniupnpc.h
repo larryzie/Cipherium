@@ -59,6 +59,26 @@ upnpDiscover(int delay, const char * multicastif,
              const char * minissdpdsock, int sameport,
              int ipv6,
              int * error);
+
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscoverAll(int delay, const char * multicastif,
+                const char * minissdpdsock, int sameport,
+                int ipv6,
+                int * error);
+
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscoverDevice(const char * device, int delay, const char * multicastif,
+                const char * minissdpdsock, int sameport,
+                int ipv6,
+                int * error);
+
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscoverDevices(const char * const deviceTypes[],
+                    int delay, const char * multicastif,
+                    const char * minissdpdsock, int sameport,
+                    int ipv6,
+                    int * error);
+
 /* freeUPNPDevlist()
  * free list returned by upnpDiscover() */
 MINIUPNP_LIBSPEC void freeUPNPDevlist(struct UPNPDev * devlist);
@@ -127,4 +147,3 @@ MINIUPNP_LIBSPEC int UPNPIGD_IsConnected(struct UPNPUrls *, struct IGDdatas *);
 #endif
 
 #endif
-

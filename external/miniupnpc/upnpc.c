@@ -10,7 +10,6 @@
 #include <string.h>
 #include <time.h>
 #ifdef _WIN32
-#include <stdint.h>
 #include <winsock2.h>
 #define snprintf _snprintf
 #else
@@ -680,7 +679,8 @@ int main(int argc, char ** argv)
 				break;
 			case 'd':
 				RemoveRedirect(&urls, &data, commandargv[0], commandargv[1],
-				               commandargc > 2 ? commandargv[2] : NULL);				break;
+				               commandargc > 2 ? commandargv[2] : NULL);
+				break;
 			case 'n':	/* aNy */
 				SetRedirectAndTest(&urls, &data,
 						   commandargv[0], commandargv[1],

@@ -333,13 +333,14 @@ parseMSEARCHReply(const char * reply, int size,
 #define UPNP_MCAST_LL_ADDR "FF02::C" /* link-local */
 #define UPNP_MCAST_SL_ADDR "FF05::C" /* site-local */
 
-/* upnpDiscover() :
+/* upnpDiscoverDevices() :
  * return a chained list of all devices found or NULL if
  * no devices was found.
  * It is up to the caller to free the chained list
  * delay is in millisecond (poll) */
 MINIUPNP_LIBSPEC struct UPNPDev *
-upnpDiscover(int delay, const char * multicastif,
+upnpDiscoverDevices(const char * const deviceTypes[],
+						 int delay, const char * multicastif,
              const char * minissdpdsock, int sameport,
              int ipv6,
              int * error)
@@ -355,23 +356,12 @@ upnpDiscover(int delay, const char * multicastif,
 	"MAN: \"ssdp:discover\"\r\n"
 	"MX: %u\r\n"
 	"\r\n";
-	static const char * const deviceList[] = {
-#if 0
-		"urn:schemas-upnp-org:device:InternetGatewayDevice:2",
-		"urn:schemas-upnp-org:service:WANIPConnection:2",
-#endif
-		"urn:schemas-upnp-org:device:InternetGatewayDevice:1",
-		"urn:schemas-upnp-org:service:WANIPConnection:1",
-		"urn:schemas-upnp-org:service:WANPPPConnection:1",
-		"upnp:rootdevice",
-		0
-	};
-	int deviceIndex = 0;
+	int deviceIndex;
 	char bufr[1536];	/* reception and emission buffer */
 	int sudp;
 	int n;
 	struct sockaddr_storage sockudp_r;
-	unsigned int mx;
+	unsigned int mx;	
 #ifdef NO_GETADDRINFO
 	struct sockaddr_storage sockudp_w;
 #else
@@ -389,18 +379,16 @@ upnpDiscover(int delay, const char * multicastif,
 	/* first try to get infos from minissdpd ! */
 	if(!minissdpdsock)
 		minissdpdsock = "/var/run/minissdpd.sock";
-	while(!devlist && deviceList[deviceIndex]) {
-		devlist = getDevicesFromMiniSSDPD(deviceList[deviceIndex],
+	for(deviceIndex = 0; !devlist && deviceTypes[deviceIndex]; deviceIndex++) {
+		devlist = getDevicesFromMiniSSDPD(deviceTypes[deviceIndex],
 		                                  minissdpdsock);
 		/* We return what we have found if it was not only a rootdevice */
-		if(devlist && !strstr(deviceList[deviceIndex], "rootdevice")) {
+		if(devlist && !strstr(deviceTypes[deviceIndex], "rootdevice")) {
 			if(error)
 				*error = UPNPDISCOVER_SUCCESS;
 			return devlist;
 		}
-		deviceIndex++;
 	}
-	deviceIndex = 0;
 #endif
 	/* fallback to direct discovery */
 #ifdef _WIN32
@@ -569,19 +557,21 @@ upnpDiscover(int delay, const char * multicastif,
 		delay = 1000;
 	}
 	/* receiving SSDP response packet */
-	for(n = 0; deviceList[deviceIndex]; deviceIndex++)
-	{
-	if(n == 0)
-	{
+	for(deviceIndex = 0; deviceTypes[deviceIndex]; deviceIndex++) {
 		/* sending the SSDP M-SEARCH packet */
 		n = snprintf(bufr, sizeof(bufr),
 		             MSearchMsgFmt,
 		             ipv6 ?
 		             (linklocal ? "[" UPNP_MCAST_LL_ADDR "]" :  "[" UPNP_MCAST_SL_ADDR "]")
 		             : UPNP_MCAST_ADDR,
-		             deviceList[deviceIndex], mx);
+		             deviceTypes[deviceIndex], mx);
 #ifdef DEBUG
-		printf("Sending %s", bufr);
+		/*printf("Sending %s", bufr);*/
+		printf("Sending M-SEARCH request to %s with ST: %s\n",
+		       ipv6 ?
+		       (linklocal ? "[" UPNP_MCAST_LL_ADDR "]" :  "[" UPNP_MCAST_SL_ADDR "]")
+		       : UPNP_MCAST_ADDR,
+		       deviceTypes[deviceIndex]);
 #endif
 #ifdef NO_GETADDRINFO
 		/* the following code is not using getaddrinfo */
@@ -600,8 +590,7 @@ upnpDiscover(int delay, const char * multicastif,
 			p->sin_port = htons(PORT);
 			p->sin_addr.s_addr = inet_addr(UPNP_MCAST_ADDR);
 		}
-		n = sendto(sudp, bufr, n, 0,
-		           &sockudp_w,
+		n = sendto(sudp, bufr, n, 0, &sockudp_w,
 		           ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in));
 		if (n < 0) {
 			if(error)
@@ -648,39 +637,38 @@ upnpDiscover(int delay, const char * multicastif,
 			break;
 		}
 #endif /* #ifdef NO_GETADDRINFO */
-	}
-	/* Waiting for SSDP REPLY packet to M-SEARCH */
-	n = receivedata(sudp, bufr, sizeof(bufr), delay, &scope_id);
-	if (n < 0) {
-		/* error */
-		if(error)
-			*error = UPNPDISCOVER_SOCKET_ERROR;
-		break;
-	} else if (n == 0) {
-		/* no data or Time Out */
-		if (devlist) {
-			/* no more device type to look for... */
-			if(error)
-				*error = UPNPDISCOVER_SUCCESS;
-			break;
-		}
-		if(ipv6) {
-			if(linklocal) {
-				linklocal = 0;
-				--deviceIndex;
+		/* Waiting for SSDP REPLY packet to M-SEARCH */
+		do {
+			n = receivedata(sudp, bufr, sizeof(bufr), delay, &scope_id);
+			if (n < 0) {
+				/* error */
+				if(error)
+					*error = UPNPDISCOVER_SOCKET_ERROR;
+				goto error;
+			} else if (n == 0) {
+				/* no data or Time Out */
+				if (devlist) {
+					/* found some devices, stop now*/
+					if(error)
+						*error = UPNPDISCOVER_SUCCESS;
+					goto error;
+				}
+				if(ipv6) {
+					/* switch linklocal flag */
+					if(linklocal) {
+						linklocal = 0;
+						--deviceIndex;
+					} else {
+						linklocal = 1;
+					}
+				}
 			} else {
-				linklocal = 1;
-			}
-		}
-	} else {
-		const char * descURL=NULL;
-		int urlsize=0;
-		const char * st=NULL;
-		int stsize=0;
-        /*printf("%d byte(s) :\n%s\n", n, bufr);*/ /* affichage du message */
-		parseMSEARCHReply(bufr, n, &descURL, &urlsize, &st, &stsize);
-		if(st&&descURL)
-		{
+				const char * descURL=NULL;
+				int urlsize=0;
+				const char * st=NULL;
+				int stsize=0;
+				parseMSEARCHReply(bufr, n, &descURL, &urlsize, &st, &stsize);
+				if(st&&descURL)	{
 #ifdef DEBUG
 			printf("M-SEARCH Reply:\nST: %.*s\nLocation: %.*s\n",
 			       stsize, st, urlsize, descURL);
@@ -701,7 +689,7 @@ upnpDiscover(int delay, const char * multicastif,
 				/* memory allocation error */
 				if(error)
 					*error = UPNPDISCOVER_MEMORY_ERROR;
-				break;
+				goto error;
 			}
 			tmp->pNext = devlist;
 			tmp->descURL = tmp->buffer;
@@ -714,9 +702,68 @@ upnpDiscover(int delay, const char * multicastif,
 			devlist = tmp;
 		}
 	}
+	} while(n > 0);
 	}
+error:
 	closesocket(sudp);
 	return devlist;
+}
+
+/* upnpDiscover() Discover IGD device */
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscover(int delay, const char * multicastif,
+             const char * minissdpdsock, int sameport,
+             int ipv6,
+             int * error)
+{
+	static const char * const deviceList[] = {
+#if 0
+		"urn:schemas-upnp-org:device:InternetGatewayDevice:2",
+		"urn:schemas-upnp-org:service:WANIPConnection:2",
+#endif
+		"urn:schemas-upnp-org:device:InternetGatewayDevice:1",
+		"urn:schemas-upnp-org:service:WANIPConnection:1",
+		"urn:schemas-upnp-org:service:WANPPPConnection:1",
+		"upnp:rootdevice",
+		/*"ssdp:all",*/
+		0
+	};
+	return upnpDiscoverDevices(deviceList,
+	                           delay, multicastif, minissdpdsock, sameport,
+	                           ipv6, error);
+}
+
+/* upnpDiscoverAll() Discover all UPnP devices */
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscoverAll(int delay, const char * multicastif,
+                const char * minissdpdsock, int sameport,
+                int ipv6,
+                int * error)
+{
+	static const char * const deviceList[] = {
+		/*"upnp:rootdevice",*/
+		"ssdp:all",
+		0
+	};
+	return upnpDiscoverDevices(deviceList,
+	                           delay, multicastif, minissdpdsock, sameport,
+	                           ipv6, error);
+}
+
+/* upnpDiscoverDevice() Discover a specific device */
+MINIUPNP_LIBSPEC struct UPNPDev *
+upnpDiscoverDevice(const char * device, int delay, const char * multicastif,
+                const char * minissdpdsock, int sameport,
+                int ipv6,
+                int * error)
+{
+	const char * const deviceList[] = {
+		device,
+		0
+	};
+	return upnpDiscoverDevices(deviceList,
+	                           delay, multicastif, minissdpdsock, sameport,
+	                           ipv6, error);
 }
 
 /* freeUPNPDevlist() should be used to

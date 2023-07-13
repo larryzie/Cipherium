@@ -72,7 +72,7 @@ namespace Tools
         static decoded_block_sizes instance;
 
       private:
-        std::vector<int> m_data;
+        std::vector<int> m_data{-1};
       };
 
       decoded_block_sizes decoded_block_sizes::instance;

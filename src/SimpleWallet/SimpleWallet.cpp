@@ -475,6 +475,7 @@ simple_wallet::simple_wallet(System::Dispatcher& dispatcher, const CryptoNote::C
   m_consoleHandler.setHandler("set_log", boost::bind(&simple_wallet::set_log, this, boost::placeholders::_1), "set_log <level> - Change current log level, <level> is a number 0-4");
   m_consoleHandler.setHandler("address", boost::bind(&simple_wallet::print_address, this, boost::placeholders::_1), "Show current wallet public address");
   m_consoleHandler.setHandler("dumpprivkeys", boost::bind(&simple_wallet::print_private_keys, this, boost::placeholders::_1), "Show current wallet private keys");
+  m_consoleHandler.setHandler("keygen", boost::bind(&simple_wallet::vanity_key_gen, this, boost::placeholders::_1), "Create vanity public address");
   m_consoleHandler.setHandler("save", boost::bind(&simple_wallet::save, this, boost::placeholders::_1), "Save wallet synchronized data");
   m_consoleHandler.setHandler("reset", boost::bind(&simple_wallet::reset, this, boost::placeholders::_1), "Discard cache data and start synchronizing from the start");
   m_consoleHandler.setHandler("help", boost::bind(&simple_wallet::help, this, boost::placeholders::_1), "Show this help");
@@ -1081,11 +1082,16 @@ bool simple_wallet::print_address(const std::vector<std::string> &args/* = std::
   return true;
 }
 //----------------------------------------------------------------------------------------------------
-bool simple_wallet::print_private_keys(const std::vector<std::string> &args/* = std::vector<std::string>()*/) {
+bool simple_wallet::print_private_keys(const std::vector<std::string> &args) {
   AccountKeys keys;
   m_wallet->getAccountKeys(keys);
   success_msg_writer() << "Your private spend key is: " << Common::podToHex(keys.spendSecretKey);
   success_msg_writer() << "Your private view key is: " << Common::podToHex(keys.viewSecretKey);
+  return true;
+}
+//----------------------------------------------------------------------------------------------------
+bool simple_wallet::vanity_key_gen(const std::vector<std::string> &args) {
+  success_msg_writer() << "Vanity key generator under development.";
   return true;
 }
 //----------------------------------------------------------------------------------------------------

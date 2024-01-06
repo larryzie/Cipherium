@@ -24,7 +24,7 @@ public:
 
 private:
   Dispatcher* dispatcher;
-  bool state;
+  bool state{false};
   void* first;
   void* last;
 };

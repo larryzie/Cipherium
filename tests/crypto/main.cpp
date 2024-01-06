@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
       chash prefix_hash;
       Crypto::PublicKey pub;
       Crypto::Signature sig;
-      bool expected, actual;
+      bool expected{false}, actual;
       get(input, prefix_hash, pub, sig, expected);
       actual = check_signature(prefix_hash, pub, sig);
       if (expected != actual) {

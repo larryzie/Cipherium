@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <string>
+#include <list>
 
 #include "IWalletLegacy.h"
 

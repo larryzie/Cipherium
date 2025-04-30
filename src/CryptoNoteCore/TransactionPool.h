@@ -5,6 +5,7 @@
 #pragma once
 
 #include <set>
+#include <list>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -204,5 +205,3 @@ namespace CryptoNote {
     TimestampTransactionsIndex m_timestampIndex;
   };
 }
-
-

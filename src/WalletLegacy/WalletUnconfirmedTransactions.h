@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <list>
 #include <time.h>
 #include <boost/functional/hash.hpp>
 

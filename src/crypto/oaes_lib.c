@@ -512,7 +512,7 @@ OAES_RET oaes_sprintf(
 
 		clock_gettime(CLOCK_REALTIME, &timer);
 		gmTimer = gmtime(&timer.tv_sec);
-		_test = (long *) calloc(sizeof(long), timer.tv_nsec );
+		_test = (long *) calloc(timer.tv_nsec, sizeof(long));
 		_ret = (uint32_t)(gmTimer->tm_year + 1900 + gmTimer->tm_mon + 1 + gmTimer->tm_mday +
 			gmTimer->tm_hour + gmTimer->tm_min + gmTimer->tm_sec + timer.tv_nsec +
 			(uintptr_t) ( _test + timer.tv_nsec ) + getpid());
@@ -620,7 +620,7 @@ static OAES_RET oaes_key_gen( OAES_CTX * ctx, size_t key_size )
 	if( NULL == _ctx )
 		return OAES_RET_ARG1;
 	
-	_key = (oaes_key *) calloc( sizeof( oaes_key ), 1 );
+	_key = (oaes_key *) calloc(1, sizeof(oaes_key));
 	
 	if( NULL == _key )
 		return OAES_RET_MEM;
@@ -794,7 +794,7 @@ OAES_RET oaes_key_import( OAES_CTX * ctx,
 	if( _ctx->key )
 		oaes_key_destroy( &(_ctx->key) );
 	
-	_ctx->key = (oaes_key *) calloc( sizeof( oaes_key ), 1 );
+	_ctx->key = (oaes_key *) calloc(1, sizeof(oaes_key));
 	
 	if( NULL == _ctx->key )
 		return OAES_RET_MEM;
@@ -846,7 +846,7 @@ OAES_RET oaes_key_import_data( OAES_CTX * ctx,
 	if( _ctx->key )
 		oaes_key_destroy( &(_ctx->key) );
 	
-	_ctx->key = (oaes_key *) calloc( sizeof( oaes_key ), 1 );
+	_ctx->key = (oaes_key *) calloc(1, sizeof(oaes_key));
 	
 	if( NULL == _ctx->key )
 		return OAES_RET_MEM;
@@ -875,7 +875,7 @@ OAES_RET oaes_key_import_data( OAES_CTX * ctx,
 
 OAES_CTX * oaes_alloc(void)
 {
-	oaes_ctx * _ctx = (oaes_ctx *) calloc( sizeof( oaes_ctx ), 1 );
+	oaes_ctx * _ctx = (oaes_ctx *) calloc(1, sizeof(oaes_ctx));
 	
 	if( NULL == _ctx )
 		return NULL;
